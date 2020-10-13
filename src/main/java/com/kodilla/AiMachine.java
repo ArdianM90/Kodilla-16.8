@@ -54,9 +54,9 @@ public class AiMachine {
             int j = 0;
             while (j < board.getRowsQuantity()) {
                 if (board.getElement(i, j).getValue() == -1) {
+                    //petla trafila na pierwszy element - co jesli jest ich wiecej niz 1, i wypelnienie pierwszego koliduje z nastepnymi?
                     if (board.getElement(i, j).getPossibleValues().stream().filter(e -> e != -1).count() == 1) {
                         int val = board.getElement(i, j).getPossibleValues().stream().filter(e -> e != -1).collect(Collectors.toList()).get(0);
-                        //System.out.println("Trafiłem na możliwość wprowadzenia liczby: wiersz [" + (i + 1) + "], kolumna [" + (j + 1) + "], wartość [" + val + "]");
                         if (board.trySetValue(i, j, val)) {
                             didSomeOperation = true;
                         };
