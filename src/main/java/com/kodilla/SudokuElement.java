@@ -35,6 +35,10 @@ public class SudokuElement {
         return true;
     }
 
+    public List<Integer> getPossibleValues() {
+        return this.possibleValues;
+    }
+
     public int getValue() {
         return value;
     }
