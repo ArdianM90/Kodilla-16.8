@@ -1,6 +1,5 @@
 package com.kodilla;
 
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class SudokuGame {
@@ -8,24 +7,23 @@ public class SudokuGame {
 
     public void play() {
         SudokuBoard board = new SudokuBoard();
+        AiMachine aiMachine = new AiMachine();
         String playerChoice = "";
         while (!playerChoice.equals("SUDOKU")) {
             System.out.println("Podaj 3 cyfry z przedziału od 1 do 9 oddzielone przecinkami, np: 2,3,9");
             System.out.println("gdzie 2 - oznacza nr kolumny, 3 - nr wiersza, a 9 - wpisywaną cyfrę.");
             System.out.println("Aby wypełnić tablicę sudoku wpisz: SUDOKU.");
             playerChoice = input.nextLine();
-//            System.out.println("Użytkownik wpisał: "+playerChoice);
             if (checkGivenDigits(playerChoice)) {
-                //check row
-                //check column
-                //check block
                 int x = Character.getNumericValue(playerChoice.charAt(0))-1;
                 int y = Character.getNumericValue(playerChoice.charAt(2))-1;
                 int val = Character.getNumericValue(playerChoice.charAt(4));
-                board.setValueAt(x, y, val);
+                if (!board.trySetValue(x, y, val))
+                    System.out.println("Nie można ustawić wartości "+val+" na żądanym polu - wartość się powtarza w wierszu, kolumnie, albo bloku 3x3.");;
             } else {
                 System.out.println("Błąd. Nieprawidłowy wpis.");
             }
+            //tymczasowe wypisywanie na ekran
             int[][] valuesArray = board.getValuesArray();
             System.out.println("=========");
             for (int i = 0; i < 9; i++) {
@@ -39,7 +37,9 @@ public class SudokuGame {
                 System.out.println();
             }
             System.out.println("=========");
+            //==============================
         }
+        aiMachine.fillSudoku(board);
 //        System.out.println("  123 456 789 ");
 //        System.out.println("  -----------  ");
 //        System.out.println("1|   |   |   | ");
