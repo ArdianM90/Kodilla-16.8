@@ -37,8 +37,8 @@ public class SudokuGame {
             //tymczasowe wypisywanie na ekran
             int[][] valuesArray = board.getValuesArray();
             System.out.println("=========");
-            for (int i = 0; i < 9; i++) {
-                for (int j = 0; j < 9; j++) {
+            for (int j = 0; j < 9; j++) {
+                for (int i = 0; i < 9; i++) {
                     if (valuesArray[i][j] < 0) {
                         System.out.print("  ");
                     } else {
@@ -57,20 +57,6 @@ public class SudokuGame {
         }
         AiMachine aiMachine = new AiMachine(board);
         aiMachine.fillSudoku();
-//        System.out.println("  123 456 789 ");
-//        System.out.println("  -----------  ");
-//        System.out.println("1|   |   |   | ");
-//        System.out.println("2|   |   |   | ");
-//        System.out.println("3|   |   |   | ");
-//        System.out.println(" ------------- ");
-//        System.out.println("4|   |   |   | ");
-//        System.out.println("5|   |   |   | ");
-//        System.out.println("6|   |   |   | ");
-//        System.out.println(" ------------- ");
-//        System.out.println("7|   |   |   | ");
-//        System.out.println("8|   |   |   | ");
-//        System.out.println("9|   |   |   | ");
-//        System.out.println("  -----------  ");
     }
 
     private boolean checkGivenDigits(String playerChoice) {

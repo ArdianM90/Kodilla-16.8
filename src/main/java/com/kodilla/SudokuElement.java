@@ -39,6 +39,10 @@ public class SudokuElement {
         return this.possibleValues;
     }
 
+    public int countPossibilities() {
+        return (int)possibleValues.stream().filter(e -> e != EMPTY).count();
+    }
+
     public int getValue() {
         return value;
     }
