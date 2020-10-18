@@ -6,8 +6,9 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class AiMachine {
-    public static int EMPTY = -1;
+    private static final int EMPTY = -1;
     private SudokuBoard board;
+    private PrevMovesRepo boardRepository = new PrevMovesRepo();
     private Random rnd = new Random();
 
     public AiMachine(SudokuBoard board) {
@@ -16,21 +17,46 @@ public class AiMachine {
 
     public void fillSudoku() {
         int loopCounter = 0;
-        //while (nie wszystkie pola są wypełnione) {
-        boolean doNextLoop = true;
-        while (doNextLoop) {
+        boolean notFilledYet = true;
+        boolean noNeedToGuess = true;
+        boolean putGuessSuccess = true;
+        while (notFilledYet && putGuessSuccess) {
+            if (noNeedToGuess) { //NORMALNE WYPELNIANIE JEDYNEK
+                noNeedToGuess = loopOverAllElements();
+            } else { //ZGADYWANIE
+                List<Integer> possibilities = findPossibilities();
+                System.out.println("Possibilites size: "+possibilities.size());
+                try {
+                    int guessedValueIndex = rnd.nextInt(possibilities.size());
+                    int guessedValue = possibilities.get(guessedValueIndex);
+                    System.out.println("Próbuję wstawić wartość "+guessedValue+".");
+                    //zapis stanu tablicy Sudoku
+                        //- usuniecie 'guessedValue' z mozliwosci w zapisanej tablicy
+                    putGuessSuccess = tryPutGuessedValue(guessedValue, possibilities.size());
+                    if (putGuessSuccess) {
+                        System.out.println("=============================");
+                        System.out.println("Wstawiłem wartość "+guessedValue+".");
+                        System.out.println("=============================");
+                        noNeedToGuess = true;
+                    } else {
+                        System.out.println("=============================");
+                        System.out.println("Nie udało się wstawic wartosci "+guessedValue+".");
+                        System.out.println("=============================");
+                    }
+                }
+                catch (IllegalArgumentException e) {
+                    System.out.println("Błąd losowania wartości.");
+                    System.out.println("Tablica SUDOKU nie jest możliwa do wykonania.");
+                    System.exit(0);
+                    //wczytanie stanu poprzedniej tablicy Sudoku
+                        //wylosowanie nowej wartosci 'guessedValue'
+                }
+            }
+            notFilledYet = !board.isFilled();
             loopCounter++;
-            doNextLoop = loopOverAllElements();
+            soutValues(board);
+            soutPossibilities(board);
         }
-
-        //losowanie()
-        List<Integer> possibilities = findPossibilities();
-        int guessedValueIndex = rnd.nextInt(possibilities.size());
-        int guessedValue = possibilities.get(guessedValueIndex);
-        System.out.println("Zgadłem i wstawiam wartość "+guessedValue+".");
-        //losowanie()
-
-        //}
         System.out.println("Zrobiłem "+loopCounter+" petli i sie zatrzymalem na braku oczywistych wyborow.");
         System.out.println();
         //======TEST======
@@ -92,6 +118,25 @@ public class AiMachine {
         return theLowestPossibility;
     }
 
+    private boolean tryPutGuessedValue(int guessedValue, int possibilitiesQuantity) {
+        boolean put = false;
+        boolean notFoundYet = true;
+        int j = 0;
+        while (j < board.getRowsQuantity() && notFoundYet) {
+            int i = 0;
+            while (i < board.getRowsQuantity() && notFoundYet) {
+                if (board.getElement(i, j).getValue() == EMPTY && board.getElement(i, j).countPossibilities() == possibilitiesQuantity) {
+                    notFoundYet = false;
+                    System.out.println("Próba PUT: x["+i+"], y["+j+"], val["+guessedValue+"]");
+                    put = board.trySetValue(i, j, guessedValue);
+                }
+                i++;
+            }
+            j++;
+        }
+        return put;
+    }
+
     private void soutValues(SudokuBoard board) {
         System.out.println("WPROWADZONA TABLICA:");
         for (int j = 0; j < board.getColumnsQuantity(); j++) {
@@ -114,7 +159,11 @@ public class AiMachine {
                 if (board.getElement(i, j).getValue() == EMPTY) {
                     System.out.print(board.getElement(i, j).getPossibleValues().stream().filter(e -> e != EMPTY).count()+" ");
                 } else {
-                    System.out.print("- ");
+                    if (board.getElement(i, j).getValue() == EMPTY && board.getElement(i, j).getPossibleValues().size() == 0) {
+                        System.out.print("X ");
+                    } else {
+                        System.out.print("- ");
+                    }
                 }
             }
             System.out.println();

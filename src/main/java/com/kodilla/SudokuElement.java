@@ -2,15 +2,17 @@ package com.kodilla;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SudokuElement {
-    public static int EMPTY = -1;
+    private static final int EMPTY = -1;
+    private static final int POSSIBILITIES_QUANTITY = 10;
     private int value;
     private List<Integer> possibleValues = new ArrayList<>();
 
     public SudokuElement() {
         this.value = EMPTY;
-        for (int i = 1; i < 10; i++) {
+        for (int i = 1; i < POSSIBILITIES_QUANTITY; i++) {
             possibleValues.add(i);
         }
     }
@@ -49,5 +51,24 @@ public class SudokuElement {
 
     public boolean valueIsSet() {
         return value != EMPTY;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SudokuElement that = (SudokuElement) o;
+        if (value != that.getValue())
+            return false;
+        for (int i = 0; i < POSSIBILITIES_QUANTITY; i++) {
+            if (possibleValues.get(i) != that.getPossibleValues().get(i))
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value)+Objects.hash(possibleValues)*100;
     }
 }

@@ -2,10 +2,12 @@ package com.kodilla;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SudokuBoard {
-    private final int COLUMNS = 9;
-    private final int ROWS = 9;
+    private static final int COLUMNS = 9;
+    private static final int ROWS = 9;
+    private static final int EMPTY = -1;
     private List<List<SudokuElement>> columns = new ArrayList<>();
     //DO ZROBIENIA: utworzyć klasę possibilitiesSetter() i przeniesc metody do niej
 
@@ -115,6 +117,18 @@ public class SudokuBoard {
         return new int[]{newX, newY};
     }
 
+    public boolean isFilled() {
+        boolean boardIsFilled = true;
+        for (int j = 0; j < COLUMNS; j++) {
+            for (int i = 0; i < ROWS; i++) {
+                if (columns.get(i).get(j).getValue() == EMPTY) {
+                    boardIsFilled = false;
+                }
+            }
+        }
+        return boardIsFilled;
+    }
+
     public int[][] getValuesArray() {
         int[][] valuesArray = new int[COLUMNS][ROWS];
         for (int i = 0; i < COLUMNS; i++) {
@@ -135,5 +149,31 @@ public class SudokuBoard {
 
     public int getRowsQuantity() {
         return ROWS;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SudokuBoard that = (SudokuBoard) o;
+        for (int i = 0; i < COLUMNS; i++) {
+            for (int j = 0; j < ROWS; j++) {
+                if (!columns.get(i).get(j).equals(that.columns.get(i).get(j))) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 1;
+        for (int i = 0; i < COLUMNS; i++) {
+            for (int j = 0; j < ROWS; j++) {
+                hash = hash * Objects.hash(columns.get(i).get(j));
+            }
+        }
+        return hash;
     }
 }
