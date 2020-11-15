@@ -21,6 +21,19 @@ public class SudokuBoard {
         }
     }
 
+    public SudokuBoard(SudokuBoard entryBoard) {
+        for (int i = 0; i < COLUMNS; i++) {
+            List<SudokuElement> singleColumn = new ArrayList<>();
+            for (int j = 0; j < ROWS; j++) {
+                SudokuElement newElement = new SudokuElement();
+                newElement.setValue(entryBoard.getElement(i, j).getValue());
+                newElement.setPossibleValues(entryBoard.getElement(i, j).getPossibleValues());
+                singleColumn.add(newElement);
+            }
+            columns.add(singleColumn);
+        }
+    }
+
     public boolean trySetValue(int x, int y, int value) {
         if (getElement(x, y).valueIsSet()) {
             int oldValue = getElement(x, y).getValue();
@@ -32,6 +45,8 @@ public class SudokuBoard {
                 return false;
         }
         impossibleValuesSetter(x, y, value);
+        System.out.println("Wstawilem wartosc "+value+" na wsp. "+(x+1)+", "+(y+1)+". Pozostale mozliwosci: "+getElement(x, y).countPossibilities()+".");
+        System.out.println();
         return true;
     }
 

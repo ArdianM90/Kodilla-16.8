@@ -1,61 +1,79 @@
 package com.kodilla;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 public class AiMachine {
     private static final int EMPTY = -1;
     private SudokuBoard board;
     private PrevMovesRepo boardRepository = new PrevMovesRepo();
-    private Random rnd = new Random();
 
     public AiMachine(SudokuBoard board) {
         this.board = board;
     }
 
     public void fillSudoku() {
+        System.out.println();
+        System.out.println("====ROZPOCZYNAM WYPELNIANIE TABLICY====");
+        System.out.println("=======================================");
+        System.out.println("=======================================");
         int loopCounter = 0;
         boolean notFilledYet = true;
         boolean noNeedToGuess = true;
-        boolean putGuessSuccess = true;
-        while (notFilledYet && putGuessSuccess) {
+        int testCounter = 0;
+        while (notFilledYet && testCounter < 1000) {
             if (noNeedToGuess) { //NORMALNE WYPELNIANIE JEDYNEK
                 noNeedToGuess = loopOverAllElements();
             } else { //ZGADYWANIE
-                List<Integer> possibilities = findPossibilities();
-                System.out.println("Possibilites size: "+possibilities.size());
+                List<Integer> possibilities = theSmallestPossibilitiesList();
+                List<Integer> grids = guessedElementGrids();
                 try {
-                    int guessedValueIndex = rnd.nextInt(possibilities.size());
-                    int guessedValue = possibilities.get(guessedValueIndex);
-                    System.out.println("Próbuję wstawić wartość "+guessedValue+".");
-                    //zapis stanu tablicy Sudoku
-                        //- usuniecie 'guessedValue' z mozliwosci w zapisanej tablicy
-                    putGuessSuccess = tryPutGuessedValue(guessedValue, possibilities.size());
-                    if (putGuessSuccess) {
-                        System.out.println("=============================");
-                        System.out.println("Wstawiłem wartość "+guessedValue+".");
-                        System.out.println("=============================");
-                        noNeedToGuess = true;
-                    } else {
-                        System.out.println("=============================");
-                        System.out.println("Nie udało się wstawic wartosci "+guessedValue+".");
-                        System.out.println("=============================");
-                    }
+                    int guessedValue = possibilities
+                            .stream()
+                            .mapToInt(e -> e)
+                            .min()
+                            .orElseThrow(IllegalArgumentException::new);
+                    boardRepository.save(new SudokuBoard(board), grids, guessedValue);
+                    //board to REFERENCJA!!! co zrobic zeby board.repository.save() dostal KOPIE - NIE REFERENCJE do board?!
+                    noNeedToGuess = board.trySetValue(grids.get(0), grids.get(1), guessedValue);
+                    System.out.println("Il pozostalych mozliwosci: "+boardRepository.getLastBoard().getElement(grids.get(0), grids.get(1)).countPossibilities());
                 }
                 catch (IllegalArgumentException e) {
-                    System.out.println("Błąd losowania wartości.");
-                    System.out.println("Tablica SUDOKU nie jest możliwa do wykonania.");
-                    System.exit(0);
-                    //wczytanie stanu poprzedniej tablicy Sudoku
-                        //wylosowanie nowej wartosci 'guessedValue'
+                    System.out.println();
+                    System.out.println("Błąd - brak możliwych cyfr do wstawienia. Tablica SUDOKU nie jest możliwa do wykonania.");
+                    int possibilitiesQuantity = boardRepository.getLastBoard().getElement(grids.get(0), grids.get(1)).countPossibilities();
+                    System.out.println("W elemencie na wsp. "+boardRepository.getLastSave().getGrids().get(0)+", "+boardRepository.getLastSave().getGrids().get(1)+", val. "+boardRepository.getLastSave().getGuessedValue()+", mam jeszcze "+boardRepository.getLastSave().getPossibilitiesQuantity()+" innych mozliwosci. Gridy: "+boardRepository.getLastSave().getGrids());
+                    System.out.println(boardRepository.getLastSave().getBoard().getElement(boardRepository.getLastSave().getGrids().get(0), boardRepository.getLastSave().getGrids().get(1)).getPossibleValues());
+//                    soutPossibilities(boardRepository.getLastSave().getBoard());
+                    if (possibilitiesQuantity > 1) {
+                        System.out.println("Mam wiecej niz 1 mozliowsc -> usuwam poprzednia mozliwosc, probuje nastepnej.");
+                        boardRepository.updateLastSaveNextPossibility();
+                    } else {
+                        System.out.println("Mam tylko 1 mozliowsc -> usuwam save i laduje poprzedni.");
+                        boardRepository.removeLastSave();
+                        boardRepository.updateLastSaveNextPossibility();
+                    }
+                    board = boardRepository.getLastBoard();
+                    System.out.println("Probuje wstawic wartosc "+boardRepository.getLastSave().getGuessedValue()+" na gridy "+grids.get(0)+", "+grids.get(1)+".");
+                    boolean tempSuccess = board.trySetValue(grids.get(0), grids.get(1), boardRepository.getLastSave().getGuessedValue());
+                    noNeedToGuess = tempSuccess;
+                    if(tempSuccess) {
+                        System.out.println("Wstawianie zgadywanej wartosci zakonczone SUKCESEM.");
+                    } else {
+                        System.out.println("Wstawianie zgadywanej wartosci zakonczone PORAZKA.");
+                    }
+//                    System.exit(0);
                 }
             }
             notFilledYet = !board.isFilled();
             loopCounter++;
             soutValues(board);
             soutPossibilities(board);
+            System.out.println("=============================");
+            System.out.println("=============================");
+            testCounter++;
         }
         System.out.println("Zrobiłem "+loopCounter+" petli i sie zatrzymalem na braku oczywistych wyborow.");
         System.out.println();
@@ -75,9 +93,10 @@ public class AiMachine {
                     //petla trafila na pierwszy element - co jesli jest ich wiecej niz 1, i wypelnienie pierwszego koliduje z nastepnymi?
                     if (board.getElement(i, j).getPossibleValues().stream().filter(e -> e != -1).count() == 1) {
                         int val = board.getElement(i, j).getPossibleValues().stream().filter(e -> e != -1).collect(Collectors.toList()).get(0);
-                        if (board.trySetValue(i, j, val)) {
-                            didSomeOperation = true;
-                        };
+                        SudokuBoard boardSave = new SudokuBoard(board);
+                        List<Integer> gridsSave = Arrays.asList(i, j);
+                        didSomeOperation = board.trySetValue(i, j, val);
+                        boardRepository.save(boardSave, gridsSave, val);
                     }
                 }
                 j++;
@@ -87,15 +106,15 @@ public class AiMachine {
         return didSomeOperation;
     }
 
-    private List<Integer> findPossibilities() {
+    private List<Integer> theSmallestPossibilitiesList() {
         List<Integer> possibilities = new ArrayList<>();
-        int theLowestPossibility = findTheLowestPossibilitiesQuantity();
+        int theLowestQuantity = findTheLowestPossibilitiesQuantity();
         boolean notFoundYet = true;
         int j = 0;
         while (j < board.getRowsQuantity() && notFoundYet) {
             int i = 0;
             while (i < board.getRowsQuantity() && notFoundYet) {
-                if (board.getElement(i, j).getValue() == EMPTY && board.getElement(i, j).countPossibilities() == theLowestPossibility) {
+                if (board.getElement(i, j).getValue() == EMPTY && board.getElement(i, j).countPossibilities() == theLowestQuantity) {
                     notFoundYet = false;
                     board.getElement(i, j).getPossibleValues().stream().filter(e -> e != EMPTY).forEach(possibilities::add);
                 }
@@ -104,6 +123,26 @@ public class AiMachine {
             j++;
         }
         return possibilities;
+    }
+
+    private List<Integer> guessedElementGrids() {
+        List<Integer> grids = new ArrayList<>();
+        int theLowestQuantity = findTheLowestPossibilitiesQuantity();
+        boolean notFoundYet = true;
+        int j = 0;
+        while (j < board.getRowsQuantity() && notFoundYet) {
+            int i = 0;
+            while (i < board.getRowsQuantity() && notFoundYet) {
+                if (board.getElement(i, j).getValue() == EMPTY && board.getElement(i, j).countPossibilities() == theLowestQuantity) {
+                    notFoundYet = false;
+                    grids.add(i);
+                    grids.add(j);
+                }
+                i++;
+            }
+            j++;
+        }
+        return grids;
     }
 
     private int findTheLowestPossibilitiesQuantity() {
@@ -116,25 +155,6 @@ public class AiMachine {
             }
         }
         return theLowestPossibility;
-    }
-
-    private boolean tryPutGuessedValue(int guessedValue, int possibilitiesQuantity) {
-        boolean put = false;
-        boolean notFoundYet = true;
-        int j = 0;
-        while (j < board.getRowsQuantity() && notFoundYet) {
-            int i = 0;
-            while (i < board.getRowsQuantity() && notFoundYet) {
-                if (board.getElement(i, j).getValue() == EMPTY && board.getElement(i, j).countPossibilities() == possibilitiesQuantity) {
-                    notFoundYet = false;
-                    System.out.println("Próba PUT: x["+i+"], y["+j+"], val["+guessedValue+"]");
-                    put = board.trySetValue(i, j, guessedValue);
-                }
-                i++;
-            }
-            j++;
-        }
-        return put;
     }
 
     private void soutValues(SudokuBoard board) {

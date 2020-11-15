@@ -6,15 +6,37 @@ import java.util.Objects;
 
 public class SudokuElement {
     private static final int EMPTY = -1;
-    private static final int POSSIBILITIES_QUANTITY = 10;
+    private static final int POSSIBILITIES_QUANTITY = 9;
     private int value;
     private List<Integer> possibleValues = new ArrayList<>();
 
     public SudokuElement() {
         this.value = EMPTY;
-        for (int i = 1; i < POSSIBILITIES_QUANTITY; i++) {
+        for (int i = 1; i <= POSSIBILITIES_QUANTITY; i++) {
             possibleValues.add(i);
         }
+    }
+
+    public void removeMinPossibility() {
+        System.out.print("Mozliwosci PRZED usunieciem min: ");
+        possibleValues.forEach(e -> System.out.print(e+", "));
+        System.out.println();
+        int min = possibleValues.stream()
+                .filter(e -> e > EMPTY)
+                .mapToInt(e -> e)
+                .min()
+                .orElse(EMPTY);
+        try {
+            possibleValues.set(possibleValues.indexOf(min), EMPTY);
+            System.out.println("Usunalem z mozliwosci wartosc "+min+".");
+        }
+        catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Blad. Brak mozliwosci do usuwania.");
+            System.out.println(possibleValues);
+        }
+        System.out.print("Mozliwosci PO usunieciu min: ");
+        possibleValues.forEach(e -> System.out.print(e+", "));
+        System.out.println();
     }
 
     public boolean setValue(int value) {
@@ -51,6 +73,12 @@ public class SudokuElement {
 
     public boolean valueIsSet() {
         return value != EMPTY;
+    }
+
+    public void setPossibleValues(List<Integer> entryPossibilities) {
+        for (int i = 0; i < POSSIBILITIES_QUANTITY; i++) {
+            possibleValues.set(i, entryPossibilities.get(i));
+        }
     }
 
     @Override
