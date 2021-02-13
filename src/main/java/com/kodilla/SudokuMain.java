@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SudokuMain {
     public static void main(String[] args) {
         SpringApplication.run(SudokuMain.class, args);
-        new SudokuGame().play();
+        SudokuGame myGame = new SudokuGame();
+        myGame.play();
     }
 }

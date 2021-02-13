@@ -10,8 +10,8 @@ public class AiMachine {
     private SudokuBoard board;
     private PrevMovesRepo boardRepository = new PrevMovesRepo();
 
-    public AiMachine(SudokuBoard board) {
-        this.board = board;
+    public AiMachine(SudokuBoard getBoard) {
+        this.board = getBoard;
     }
 
     public void fillSudoku() {
@@ -35,8 +35,11 @@ public class AiMachine {
                             .mapToInt(e -> e)
                             .min()
                             .orElseThrow(IllegalArgumentException::new);
-                    boardRepository.save(new SudokuBoard(board), grids, guessedValue);
-                    //board to REFERENCJA!!! co zrobic zeby board.repository.save() dostal KOPIE - NIE REFERENCJE do board?!
+                    try {
+                        boardRepository.save(board.getCopy(), grids, guessedValue);
+                    } catch (CloneNotSupportedException e) {
+                        System.out.println(e);
+                    }
                     noNeedToGuess = board.trySetValue(grids.get(0), grids.get(1), guessedValue);
                     System.out.println("Il pozostalych mozliwosci: "+boardRepository.getLastBoard().getElement(grids.get(0), grids.get(1)).countPossibilities());
                 }

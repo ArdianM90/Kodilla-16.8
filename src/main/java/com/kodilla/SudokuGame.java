@@ -3,7 +3,9 @@ package com.kodilla;
 import java.util.Scanner;
 
 public class SudokuGame {
-    Scanner input = new Scanner(System.in);
+    private Scanner input = new Scanner(System.in);
+    protected SudokuBoard board;
+
     //======TEST======
     int[] inputX = {2,4,6,8,1,4,6,9,2,5,8,3,7,1,2,8,9,3,7,2,5,8,1,4,6,9,2,4,6,8};
     int[] inputY = {1,1,1,1,2,2,2,2,3,3,3,4,4,5,5,5,5,6,6,7,7,7,8,8,8,8,9,9,9,9};
@@ -11,7 +13,7 @@ public class SudokuGame {
     //================
 
     public void play() {
-        SudokuBoard board = new SudokuBoard();
+        board = new SudokuBoard();
         String playerChoice = "";
         //======TEST======
         int testIterator = 0;

@@ -1,10 +1,12 @@
 package com.kodilla;
 
+import com.kodilla.prototype.Prototype;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class SudokuBoard {
+public class SudokuBoard extends Prototype {
     private static final int COLUMNS = 9;
     private static final int ROWS = 9;
     private static final int EMPTY = -1;
@@ -142,6 +144,22 @@ public class SudokuBoard {
             }
         }
         return boardIsFilled;
+    }
+
+    public SudokuBoard getCopy() throws CloneNotSupportedException {
+        SudokuBoard boardCopy = (SudokuBoard)super.clone();
+        boardCopy.columns = new ArrayList<>();
+        for (int r = 0; r < ROWS; r++) {
+            List<SudokuElement> singleRowCopy = new ArrayList<>();
+            for (int c = 0; c < COLUMNS; c++) {
+                SudokuElement newElementCopy = new SudokuElement();
+                newElementCopy.setValue(columns.get(c).get(r).getValue());
+                newElementCopy.setPossibleValues(columns.get(c).get(r).getPossibleValues());
+                singleRowCopy.add(newElementCopy);
+            }
+            boardCopy.columns.add(singleRowCopy);
+        }
+        return boardCopy;
     }
 
     public int[][] getValuesArray() {
