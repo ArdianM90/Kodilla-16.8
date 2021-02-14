@@ -26,7 +26,6 @@ public class SudokuGame {
 //            playerChoice = input.nextLine();
             //======TEST======
             playerChoice = inputX[testIterator]+","+inputY[testIterator]+","+inputVal[testIterator];
-            testIterator++;
             //================
             if (choiceDecoder.entryIsCorrect(playerChoice)) {
                 int x = choiceDecoder.getX(playerChoice);
@@ -73,6 +72,7 @@ public class SudokuGame {
             if (testIterator == inputVal.length-1) {
                 playerChoice = "SUDOKU";
             }
+            testIterator++;
             //================
             //==============================
         }
