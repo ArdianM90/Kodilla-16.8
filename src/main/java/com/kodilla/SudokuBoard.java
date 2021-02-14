@@ -37,14 +37,20 @@ public class SudokuBoard extends Prototype {
     }
 
     public boolean trySetValue(int x, int y, int value) {
+        System.out.print("W polu x: "+x+", y: "+y+" mozna wstawic liczby:");
+        List<Integer> possibilities = getElement(x, y).getPossibleValues();
+        for (Integer possibility : possibilities) {
+            if (possibility != EMPTY) {
+                System.out.print(" " + possibility + ", ");
+            }
+        }
+        System.out.println();
         if (getElement(x, y).valueIsSet()) {
-            int oldValue = getElement(x, y).getValue();
-            if (!getElement(x, y).setValue(value))
-                return false;
-            setOldValuePossible(x, y, oldValue);
-        } else {
-            if (!getElement(x, y).setValue(value))
-                return false;
+            System.out.println("Nie można ustawić wartości " + value + " na żądanym polu - wartość jest już ustawiona.");
+            return false;
+        } else if (!getElement(x, y).setValue(value)) {
+            System.out.println("Nie można ustawić wartości " + value + " na żądanym polu - wartość się powtarza w wierszu, kolumnie, albo bloku 3x3.");
+            return false;
         }
         impossibleValuesSetter(x, y, value);
         System.out.println("Wstawilem wartosc "+value+" na wsp. "+(x+1)+", "+(y+1)+". Pozostale mozliwosci: "+getElement(x, y).countPossibilities()+".");
@@ -69,7 +75,7 @@ public class SudokuBoard extends Prototype {
                 getElement(grids[0], grids[1]).setThisValueImpossible(value);
             }
         }
-        setPossibilitiesInBLock(false, x, y, value);
+        setPossibilitiesInBlock(false, x, y, value);
     }
 
     private void setOldValuePossible(int x, int y, int oldValue) {
@@ -89,30 +95,20 @@ public class SudokuBoard extends Prototype {
                 getElement(grids[0], grids[1]).setThisValuePossible(oldValue);
             }
         }
-        setPossibilitiesInBLock(true, x, y, oldValue);
+        setPossibilitiesInBlock(true, x, y, oldValue);
     }
 
-    private void setPossibilitiesInBLock(boolean possibility, int x, int y, int value) {
-        int blockModifierX = (int)Math.ceil((double)x/3)-1;
-        int blockModifierY = (int)Math.ceil((double)y/3)-1;
-        int[] xModifier = {-1, 0, 1, -1, 1, -1, 0, 1};
-        int[] yModifier = {1, 1, 1, 0, 0, -1, -1, -1};
-        for (int i = 0; i < xModifier.length; i++) {
-            int gridX = x+(blockModifierX*3)+xModifier[i];
-            int gridY = y+(blockModifierY*3)+yModifier[i];
-            try {
-                if (possibility) {
-                    getElement(gridX, gridY).setThisValuePossible(value);
+    private void setPossibilitiesInBlock(boolean setPossible, int x, int y, int value) {
+        int blockGridX = x/3;
+        int blockGridY = y/3;
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                int elementX = blockGridX*3 + col;
+                int elementY = blockGridY*3 + row;
+                if (setPossible) {
+                    getElement(elementX, elementY).setThisValuePossible(value);
                 } else {
-                    getElement(gridX, gridY).setThisValueImpossible(value);
-                }
-            }
-            catch (IndexOutOfBoundsException e) {
-                int[] grids = handleOutOfBoardException(gridX, gridY);
-                if (possibility) {
-                    getElement(grids[0], grids[1]).setThisValuePossible(value);
-                } else {
-                    getElement(grids[0], grids[1]).setThisValueImpossible(value);
+                    getElement(elementX, elementY).setThisValueImpossible(value);
                 }
             }
         }
