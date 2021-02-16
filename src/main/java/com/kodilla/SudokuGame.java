@@ -1,5 +1,8 @@
 package com.kodilla;
 
+import com.kodilla.mainmenu.EntryDataCreator;
+import com.kodilla.mainmenu.InputConsole;
+
 public class SudokuGame {
     private final InputConsole inputConsole = new InputConsole();
     private final EntryDataCreator entryDataCreator = new EntryDataCreator();

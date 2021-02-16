@@ -1,4 +1,4 @@
-package com.kodilla;
+package com.kodilla.mainmenu;
 
 import java.util.Scanner;
 

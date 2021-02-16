@@ -1,4 +1,6 @@
-package com.kodilla;
+package com.kodilla.mainmenu;
+
+import com.kodilla.SudokuBoard;
 
 import java.util.Random;
 
@@ -37,7 +39,6 @@ public class EntryDataCreator {
         return board;
     }
 
-    //====TYMCZASOWE====
     public void soutValues(SudokuBoard board) {
         System.out.println();
         System.out.println("=====================================================");
@@ -55,5 +56,4 @@ public class EntryDataCreator {
         }
         System.out.println("=====================================================");
     }
-    //====KONIEC TYMCZASOWEGO====
 }
