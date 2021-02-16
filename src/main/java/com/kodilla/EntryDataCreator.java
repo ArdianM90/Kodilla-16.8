@@ -1,6 +1,10 @@
 package com.kodilla;
 
+import java.util.Random;
+
 public class EntryDataCreator {
+    private Random rnd = new Random();
+
     public SudokuBoard manual(SudokuBoard board) {
         int[] inputX =   {2,4,6,8,1,4,6,9,2,5,8,3,7,1,2,8,9,3,7,2,5,8,1,4,6,9,2,4,6,8};
         int[] inputY =   {1,1,1,1,2,2,2,2,3,3,3,4,4,5,5,5,5,6,6,7,7,7,8,8,8,8,9,9,9,9};
@@ -12,7 +16,29 @@ public class EntryDataCreator {
                 System.out.println("BLAD podczas wstawiania wartosci "+inputVal[i]+"na swpolrzednych x: "+inputX[i]+", y: "+inputY[i]+".");
             };
         }
-        //====TYMCZASOWE====
+        soutValues(board);
+        return board;
+    }
+
+    public SudokuBoard create(int inputDigitsCount, SudokuBoard board) {
+        for (int i = 0; i < inputDigitsCount; i++) {
+            int x;
+            int y;
+            int val;
+            boolean success = false;
+            while (!success) {
+                x = rnd.nextInt(9);
+                y = rnd.nextInt(9);
+                val = rnd.nextInt(8)+1;
+                success = board.trySetValue(x, y, val);
+            }
+            soutValues(board);
+        }
+        return board;
+    }
+
+    //====TYMCZASOWE====
+    public void soutValues(SudokuBoard board) {
         System.out.println();
         System.out.println("=====================================================");
         System.out.println("ZAKONCZONO WPROWADZANIE. WYPISUJĘ WPROWADZONE LICZBY:");
@@ -28,11 +54,6 @@ public class EntryDataCreator {
             System.out.println();
         }
         System.out.println("=====================================================");
-        //====KONIEC TYMCZASOWEGO====
-        return board;
     }
-
-    public SudokuBoard create(int inputDigitsCount, SudokuBoard board) {
-        return board;
-    }
+    //====KONIEC TYMCZASOWEGO====
 }
