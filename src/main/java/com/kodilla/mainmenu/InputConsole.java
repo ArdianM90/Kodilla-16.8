@@ -7,14 +7,14 @@ public class InputConsole {
     private PlayerChoiceDecoder choiceDecoder = new PlayerChoiceDecoder();
     private String playerChoice;
 
-    public boolean goManual() {
+    public boolean testArray() {
         System.out.println("Wprowadz cyfre:");
-        System.out.println("[1] aby wprowadzic recznie dane poczatkowe SUDOKU, lub");
+        System.out.println("[1] aby wprowadzic testowa tablice SUDOKU, lub");
         System.out.println("[2] aby losowac dane poczatkowe.");
         playerChoice = input.nextLine();
         while (choiceDecoder.manualOrRandomNotCorrect(playerChoice)) {
             System.out.println("Bledny wybor. Wprowadz cyfre:");
-            System.out.println("[1] aby wprowadzic recznie dane poczatkowe SUDOKU, lub");
+            System.out.println("[1] aby wprowadzic testowa tablice SUDOKU, lub");
             System.out.println("[2] aby losowac dane poczatkowe.");
             playerChoice = input.nextLine();
         }
