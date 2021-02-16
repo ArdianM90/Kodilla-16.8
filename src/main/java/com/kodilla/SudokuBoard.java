@@ -37,24 +37,11 @@ public class SudokuBoard extends Prototype {
     }
 
     public boolean trySetValue(int x, int y, int value) {
-        System.out.print("W polu x: "+x+", y: "+y+" mozna wstawic liczby:");
         List<Integer> possibilities = getElement(x, y).getPossibleValues();
-        for (Integer possibility : possibilities) {
-            if (possibility != EMPTY) {
-                System.out.print(" " + possibility + ", ");
-            }
-        }
-        System.out.println();
-        if (getElement(x, y).valueIsSet()) {
-            System.out.println("Nie można ustawić wartości " + value + " na żądanym polu - wartość jest już ustawiona.");
-            return false;
-        } else if (!getElement(x, y).setValue(value)) {
-            System.out.println("Nie można ustawić wartości " + value + " na żądanym polu - wartość się powtarza w wierszu, kolumnie, albo bloku 3x3.");
+        if (getElement(x, y).valueIsSet() || !getElement(x, y).setValue(value)) {
             return false;
         }
         impossibleValuesSetter(x, y, value);
-        System.out.println("Wstawilem wartosc "+value+" na wsp. "+(x+1)+", "+(y+1)+". Pozostale mozliwosci: "+getElement(x, y).countPossibilities()+".");
-        System.out.println();
         return true;
     }
 

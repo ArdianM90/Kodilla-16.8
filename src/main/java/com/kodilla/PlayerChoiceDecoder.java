@@ -14,7 +14,8 @@ public class PlayerChoiceDecoder {
     }
 
     public boolean entryIsCorrect(String playerChoice) {
-        if (playerChoice.trim().length() != 5)
+        playerChoice = playerChoice.trim();
+        if (playerChoice.length() != 5)
             return false;
         if (playerChoice.charAt(1) != ',' || playerChoice.charAt(3) != ',')
             return false;
@@ -23,5 +24,31 @@ public class PlayerChoiceDecoder {
         if (playerChoice.charAt(0) == '0' || playerChoice.charAt(2) == '0' || playerChoice.charAt(4) == '0')
             return false;
         return true;
+    }
+
+    public boolean manualOrRandomNotCorrect(String playerChoice) {
+        playerChoice = playerChoice.trim();
+        if (playerChoice.trim().length() != 1)
+            return true;
+        if (playerChoice.equals("1") || playerChoice.equals("2"))
+            return false;
+        else
+            return true;
+    }
+
+    public boolean howManyRandomNotCorrect(String playerChoice) {
+        playerChoice = playerChoice.trim();
+        if (playerChoice.length() < 1 || playerChoice.length() > 2)
+            return true;
+        int number;
+        try {
+            number = Integer.parseInt(playerChoice);
+        } catch (NumberFormatException nfe) {
+            return true;
+        }
+        if (number < 1 || number > 80)
+            return true;
+        else
+            return false;
     }
 }
