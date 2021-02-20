@@ -1,5 +1,7 @@
 package com.kodilla;
 
+import com.kodilla.element.SudokuElement;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,6 +11,7 @@ public class AiMachine {
     private static final int EMPTY = -1;
     private SudokuBoard board;
     private PrevMovesRepo boardRepository = new PrevMovesRepo();
+    private final SoutMachine display = new SoutMachine();
 
     public AiMachine(SudokuBoard getBoard) {
         this.board = getBoard;
@@ -24,9 +27,9 @@ public class AiMachine {
         boolean noNeedToGuess = true;
         int testCounter = 0;
         while (notFilledYet && testCounter < 1000) {
-            if (noNeedToGuess) { //NORMALNE WYPELNIANIE JEDYNEK
-                noNeedToGuess = loopOverAllElements();
-            } else { //ZGADYWANIE
+            if (noNeedToGuess) {
+                noNeedToGuess = tryPutObviousValue();
+            } else {
                 List<Integer> possibilities = theSmallestPossibilitiesList();
                 List<Integer> grids = guessedElementGrids();
                 try {
@@ -49,7 +52,6 @@ public class AiMachine {
                     int possibilitiesQuantity = boardRepository.getLastBoard().getElement(grids.get(0), grids.get(1)).countPossibilities();
                     System.out.println("W elemencie na wsp. "+boardRepository.getLastSave().getGrids().get(0)+", "+boardRepository.getLastSave().getGrids().get(1)+", val. "+boardRepository.getLastSave().getGuessedValue()+", mam jeszcze "+boardRepository.getLastSave().getPossibilitiesQuantity()+" innych mozliwosci. Gridy: "+boardRepository.getLastSave().getGrids());
                     System.out.println(boardRepository.getLastSave().getBoard().getElement(boardRepository.getLastSave().getGrids().get(0), boardRepository.getLastSave().getGrids().get(1)).getPossibleValues());
-//                    soutPossibilities(boardRepository.getLastSave().getBoard());
                     if (possibilitiesQuantity > 1) {
                         System.out.println("Mam wiecej niz 1 mozliowsc -> usuwam poprzednia mozliwosc, probuje nastepnej.");
                         boardRepository.updateLastSaveNextPossibility();
@@ -67,44 +69,46 @@ public class AiMachine {
                     } else {
                         System.out.println("Wstawianie zgadywanej wartosci zakonczone PORAZKA.");
                     }
-//                    System.exit(0);
                 }
             }
             notFilledYet = !board.isFilled();
             loopCounter++;
-            soutValues(board);
-            soutPossibilities(board);
+            display.soutValues(board);
+            display.soutPossibilities(board);
             System.out.println("=============================");
             System.out.println("=============================");
             testCounter++;
         }
-        System.out.println("Zrobiłem "+loopCounter+" petli i sie zatrzymalem na braku oczywistych wyborow.");
+        if (board.isFilled()) {
+            System.out.println("Sudoku wypelnione w "+loopCounter+" petlach.");
+        } else {
+            System.out.println("Zrobiłem "+loopCounter+" petli i sie zatrzymalem na braku oczywistych wyborow.");
+        }
         System.out.println();
-        //======TEST======
-        soutValues(board);
-        soutPossibilities(board);
-        //================
+        display.soutValues(board);
+        display.soutPossibilities(board);
     }
 
-    private boolean loopOverAllElements() {
+    private boolean tryPutObviousValue() {
         boolean didSomeOperation = false;
-        int i = 0;
-        while(i < board.getColumnsQuantity()) {
-            int j = 0;
-            while (j < board.getRowsQuantity()) {
-                if (board.getElement(i, j).getValue() == -1) {
-                    //petla trafila na pierwszy element - co jesli jest ich wiecej niz 1, i wypelnienie pierwszego koliduje z nastepnymi?
-                    if (board.getElement(i, j).getPossibleValues().stream().filter(e -> e != -1).count() == 1) {
-                        int val = board.getElement(i, j).getPossibleValues().stream().filter(e -> e != -1).collect(Collectors.toList()).get(0);
-                        SudokuBoard boardSave = new SudokuBoard(board);
-                        List<Integer> gridsSave = Arrays.asList(i, j);
-                        didSomeOperation = board.trySetValue(i, j, val);
-                        boardRepository.save(boardSave, gridsSave, val);
-                    }
+        int row = 0;
+        while (row < board.getRowsQuantity()) {
+            int col = 0;
+            while (col < board.getColumnsQuantity()) {
+                SudokuElement theElement = board.getElement(col, row);
+                if (theElement.getValue() == EMPTY && theElement.haveSinglePossibility()) {
+                    int val = theElement.getPossibleValues().stream()
+                            .filter(e -> e != EMPTY)
+                            .collect(Collectors.toList())
+                            .get(0);
+                    SudokuBoard boardSave = new SudokuBoard(board);
+                    List<Integer> gridsSave = Arrays.asList(col, row);
+                    didSomeOperation = board.trySetValue(col, row, val);
+                    boardRepository.save(boardSave, gridsSave, val);
                 }
-                j++;
+                col++;
             }
-            i++;
+            row++;
         }
         return didSomeOperation;
     }
@@ -158,39 +162,5 @@ public class AiMachine {
             }
         }
         return theLowestPossibility;
-    }
-
-    private void soutValues(SudokuBoard board) {
-        System.out.println("WPROWADZONA TABLICA:");
-        for (int j = 0; j < board.getColumnsQuantity(); j++) {
-            for (int i = 0; i < board.getRowsQuantity(); i++) {
-                if (board.getElement(i, j).getValue() != -1) {
-                    System.out.print(board.getElement(i, j).getValue()+" ");
-                } else {
-                    System.out.print("- ");
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
-    private void soutPossibilities(SudokuBoard board) {
-        System.out.println("WYPISUJĘ ILOSCI LICZB MOZLIWYCH DO WPROWADZENIA:");
-        for (int j = 0; j < board.getColumnsQuantity(); j++) {
-            for (int i = 0; i < board.getRowsQuantity(); i++) {
-                if (board.getElement(i, j).getValue() == EMPTY) {
-                    System.out.print(board.getElement(i, j).getPossibleValues().stream().filter(e -> e != EMPTY).count()+" ");
-                } else {
-                    if (board.getElement(i, j).getValue() == EMPTY && board.getElement(i, j).getPossibleValues().size() == 0) {
-                        System.out.print("X ");
-                    } else {
-                        System.out.print("- ");
-                    }
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
     }
 }

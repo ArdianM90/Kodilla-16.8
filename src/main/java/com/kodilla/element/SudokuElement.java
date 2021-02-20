@@ -1,4 +1,4 @@
-package com.kodilla;
+package com.kodilla.element;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +61,10 @@ public class SudokuElement {
 
     public List<Integer> getPossibleValues() {
         return this.possibleValues;
+    }
+
+    public boolean haveSinglePossibility() {
+        return possibleValues.stream().filter(e -> e != EMPTY).count() == 1;
     }
 
     public int countPossibilities() {

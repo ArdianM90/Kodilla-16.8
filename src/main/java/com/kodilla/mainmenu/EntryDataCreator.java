@@ -1,11 +1,13 @@
 package com.kodilla.mainmenu;
 
+import com.kodilla.SoutMachine;
 import com.kodilla.SudokuBoard;
 
 import java.util.Random;
 
 public class EntryDataCreator {
     private final SudokuBoard board;
+    private final SoutMachine display = new SoutMachine();
     private final Random rnd = new Random();
 
     public EntryDataCreator(SudokuBoard board) {
@@ -27,7 +29,8 @@ public class EntryDataCreator {
                 System.out.println("BLAD podczas wstawiania wartosci "+inputVal[i]+"na swpolrzednych x: "+inputX[i]+", y: "+inputY[i]+".");
             };
         }
-        soutValues(board);
+        display.soutValues(board);
+        display.soutPossibilities(board);
         return board;
     }
 
@@ -44,25 +47,8 @@ public class EntryDataCreator {
                 success = board.trySetValue(x, y, val);
             }
         }
-        soutValues(board);
+        display.soutValues(board);
+        display.soutPossibilities(board);
         return board;
-    }
-
-    public void soutValues(SudokuBoard board) {
-        System.out.println();
-        System.out.println("=====================================================");
-        System.out.println("ZAKONCZONO WPROWADZANIE. WYPISUJĘ WPROWADZONE LICZBY:");
-        int[][] valuesArray = board.getValuesArray();
-        for (int j = 0; j < 9; j++) {
-            for (int i = 0; i < 9; i++) {
-                if (valuesArray[i][j] < 0) {
-                    System.out.print("- ");
-                } else {
-                    System.out.print(valuesArray[i][j]+" ");
-                }
-            }
-            System.out.println();
-        }
-        System.out.println("=====================================================");
     }
 }

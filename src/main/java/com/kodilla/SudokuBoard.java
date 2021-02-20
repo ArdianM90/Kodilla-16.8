@@ -1,5 +1,6 @@
 package com.kodilla;
 
+import com.kodilla.element.SudokuElement;
 import com.kodilla.prototype.Prototype;
 
 import java.util.ArrayList;
