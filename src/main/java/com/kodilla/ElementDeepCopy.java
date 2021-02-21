@@ -13,15 +13,15 @@ public class ElementDeepCopy {
         this.guessedValue = guessedValue;
     }
 
-    public void setMinPossibilityNotPossibleAt(List<Integer> grids) {
-        System.out.print("MOZLIWOSCI PRZED: ");
-        board.getElement(grids.get(0), grids.get(1)).getPossibleValues().forEach(e -> System.out.print(e+", "));
-        System.out.println();
-        board.getElement(grids.get(0), grids.get(1)).removeMinPossibility();
-        System.out.print("MOZLIWOSCI PO: ");
-        board.getElement(grids.get(0), grids.get(1)).getPossibleValues().forEach(e -> System.out.print(e+", "));
-        System.out.println();
-    }
+//    public void setMinPossibilityNotPossibleAt(List<Integer> grids) {
+//        System.out.print("MOZLIWOSCI PRZED: ");
+//        board.getElement(grids.get(0), grids.get(1)).getPossibleValues().forEach(e -> System.out.print(e+", "));
+//        System.out.println();
+//        board.getElement(grids.get(0), grids.get(1)).removeMinPossibility();
+//        System.out.print("MOZLIWOSCI PO: ");
+//        board.getElement(grids.get(0), grids.get(1)).getPossibleValues().forEach(e -> System.out.print(e+", "));
+//        System.out.println();
+//    }
 
     public boolean setNextGuessedValue() {
         board.getElement(grids.get(0), grids.get(1)).setThisValueImpossible(guessedValue);

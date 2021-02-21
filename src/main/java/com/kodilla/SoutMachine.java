@@ -10,11 +10,11 @@ public class SoutMachine {
             System.out.print((j+1)+". ");
         }
         System.out.println();
-        for (int j = 0; j < board.getColumnsQuantity(); j++) {
-            System.out.print((j+1)+". ");
-            for (int i = 0; i < board.getRowsQuantity(); i++) {
-                if (board.getElement(i, j).getValue() != -1) {
-                    System.out.print(" "+board.getElement(i, j).getValue()+" ");
+        for (int row = 0; row < board.getColumnsQuantity(); row++) {
+            System.out.print((row+1)+". ");
+            for (int col = 0; col < board.getRowsQuantity(); col++) {
+                if (board.getElement(row, col).getValue() != -1) {
+                    System.out.print(" "+board.getElement(row, col).getValue()+" ");
                 } else {
                     System.out.print(" - ");
                 }
@@ -25,23 +25,19 @@ public class SoutMachine {
     }
 
     public void soutPossibilities(SudokuBoard board) {
-        System.out.println("WYPISUJĘ ILOSCI LICZB MOZLIWYCH DO WPROWADZENIA:");
+        System.out.println("ILOSCI LICZB MOZLIWYCH DO WPROWADZENIA:");
         System.out.print("    ");
         for (int j = 0; j < board.getColumnsQuantity(); j++) {
             System.out.print((j+1)+". ");
         }
         System.out.println();
-        for (int j = 0; j < board.getColumnsQuantity(); j++) {
-            System.out.print((j+1)+". ");
-            for (int i = 0; i < board.getRowsQuantity(); i++) {
-                if (board.getElement(i, j).getValue() == EMPTY) {
-                    System.out.print(" "+board.getElement(i, j).getPossibleValues().stream().filter(e -> e != EMPTY).count()+" ");
+        for (int row = 0; row < board.getColumnsQuantity(); row++) {
+            System.out.print((row+1)+". ");
+            for (int col = 0; col < board.getRowsQuantity(); col++) {
+                if (board.getElement(row, col).getValue() == EMPTY) {
+                    System.out.print(" "+board.getElement(row, col).getPossibleValues().stream().filter(e -> e != EMPTY).count()+" ");
                 } else {
-                    if (board.getElement(i, j).getValue() == EMPTY && board.getElement(i, j).getPossibleValues().size() == 0) {
-                        System.out.print(" X ");
-                    } else {
-                        System.out.print(" - ");
-                    }
+                    System.out.print(" - ");
                 }
             }
             System.out.println();

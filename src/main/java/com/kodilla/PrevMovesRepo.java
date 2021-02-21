@@ -7,20 +7,36 @@ public class PrevMovesRepo {
     private static final int EMPTY = -1;
     private List<ElementDeepCopy> prevMovesList = new ArrayList<>();
 
-    public void save(SudokuBoard board, List<Integer> grids, int guessedValue) {
-        if (board.getElement(grids.get(0), grids.get(1)).countPossibilities() > 1) {
-            prevMovesList.add(new ElementDeepCopy(board, grids, guessedValue));
-            System.out.println("Zapisuje do REPO elemnt nr "+prevMovesList.size()+": val "+guessedValue+", grids "+grids.get(0)+", "+grids.get(1));
-            System.out.println("Ilość pozostalych mozliwosci we wstawianym elemencie: "+prevMovesList.get(prevMovesList.size()-1).getPossibilitiesQuantity());
-            System.out.println("======================================="+prevMovesList.size()+"=======================================");
-            System.out.println();
-        } else {
-            System.out.println("NIE zapisuje do REPO, nie warto - ilosc mozliwosci: "+board.getElement(grids.get(0), grids.get(1)).countPossibilities());
+    public void save(SudokuBoard board, List<Integer> grids, int value) {
+        System.out.println("Proba zapisu");
+        try {
+            SudokuBoard boardCopy = board.getCopy();
+            boardCopy.getElement(grids.get(0), grids.get(1)).removePossibility(value);
+            if (boardCopy.getElement(grids.get(0), grids.get(1)).countPossibilities() > 0) {
+                prevMovesList.add(new ElementDeepCopy(boardCopy, grids, value));
+                System.out.println("Zapisuje do REPO elemnt nr "+prevMovesList.size()+": val "+value+", grids "+grids.get(0)+", "+grids.get(1));
+                System.out.println("Ilość pozostalych mozliwosci we wstawianym elemencie: "+prevMovesList.get(prevMovesList.size()-1).getPossibilitiesQuantity());
+                System.out.println("========================ILOSC ZAPISOW: "+prevMovesList.size()+"=======================================");
+                System.out.println();
+            } else {
+                System.out.println("NIE zapisuje do REPO.");
+                System.out.println("Ilość pozostalych mozliwosci we wstawianym elemencie: "+boardCopy.getElement(grids.get(0), grids.get(1)).countPossibilities());
+                System.out.println("========================ILOSC ZAPISOW: "+prevMovesList.size()+"=======================================");
+                System.out.println();
+            }
+        }
+        catch (CloneNotSupportedException e) {
+            System.out.println("BLAD klonowania planszy: "+e.getMessage());
         }
     }
 
-    public SudokuBoard getLastBoard() {
-        return new SudokuBoard(prevMovesList.get(prevMovesList.size()-1).getBoard());
+    public SudokuBoard loadPrevBoard() throws CloneNotSupportedException {
+        ElementDeepCopy lastSave = prevMovesList.get(prevMovesList.size()-1);
+        SudokuBoard savedBoard = lastSave.getBoard().getCopy();
+        if (savedBoard.hasObviousValue()) {
+            prevMovesList.remove(prevMovesList.size()-1);
+        }
+        return savedBoard;
     }
 
     public boolean setNextPossibleValue() {
@@ -32,13 +48,13 @@ public class PrevMovesRepo {
         return prevMovesList.get(prevMovesList.size()-1);
     }
 
-    public void removeLastSaveMinPossibilityAt(List<Integer> grids) {
+//    public void removeLastSaveMinPossibilityAt(List<Integer> grids) {
 //        while (getLastSave().getPossibilitiesQuantity() <= 1) {
 //            removeLastSave();
 //        }
 //        getLastSave().removeMinPossibility(grids);
-        getLastSave().setMinPossibilityNotPossibleAt(grids);
-    }
+//        getLastSave().setMinPossibilityNotPossibleAt(grids);
+//    }
 
     public void removeLastSave() {
         System.out.println();
@@ -48,13 +64,13 @@ public class PrevMovesRepo {
         System.out.println();
     }
 
-    public void updateLastSaveNextPossibility() {
-        SudokuBoard board = this.getLastSave().getBoard();
-        List<Integer> grids = this.getLastSave().getGrids();
-        System.out.println("Usuwam min mozliwosc z elementu na wsp "+(grids.get(0)+1)+", "+(grids.get(1)+1)+": val "+board.getElement(grids.get(0), grids.get(1)).getValue()+".");
-        board.getElement(grids.get(0), grids.get(1)).removeMinPossibility();
-        int guessedValue = this.getLastSave().getGuessedValue();
-        this.removeLastSave();
-        this.save(board, grids, guessedValue);
-    }
+//    public void updateLastSaveNextPossibility() {
+//        SudokuBoard board = this.getLastSave().getBoard();
+//        List<Integer> grids = this.getLastSave().getGrids();
+//        System.out.println("Usuwam min mozliwosc z elementu na wsp "+(grids.get(0)+1)+", "+(grids.get(1)+1)+": val "+board.getElement(grids.get(0), grids.get(1)).getValue()+".");
+//        board.getElement(grids.get(0), grids.get(1)).removeMinPossibility();
+//        int guessedValue = this.getLastSave().getGuessedValue();
+//        this.removeLastSave();
+//        this.save(board, grids, guessedValue);
+//    }
 }
