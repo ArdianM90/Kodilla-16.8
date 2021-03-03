@@ -23,7 +23,7 @@ public class AiMachine {
         System.out.println();
         boolean notFilledYet = true;
         int loopCounter = 0;
-        while (notFilledYet && loopCounter < 100) {
+        while (notFilledYet && loopCounter < 10000) {
             if (board.hasObviousValue()) {
                 tryPutObviousValue();
             } else {
@@ -44,6 +44,9 @@ public class AiMachine {
                 catch (ElementNotFoundException e) {
                     try {
                         board = boardRepository.loadPrevBoard();
+                        if (board == null) {
+                            System.out.println("Brak możlwiości wczytania SAVE - tego sudoku nie da się wypełnić!");
+                        }
                     } catch (CloneNotSupportedException e2) {
                         System.out.println("ERROR - blad ladowania wczesniejszej wersji planszy: "+e2.getMessage());
                     }
@@ -57,8 +60,8 @@ public class AiMachine {
         }
         if (board.isFilled()) {
             System.out.println("Sudoku wypelnione w "+ loopCounter +" petlach.");
-        } else {
-            System.out.println("Zrobiłem "+ loopCounter +" petli i sie zmeczylem.");
+        } else if (loopCounter == 10000) {
+            System.out.println("Zrobiłem 10000 petli i sie zmeczylem.");
         }
         System.out.println();
         display.soutValues(board);
@@ -67,6 +70,8 @@ public class AiMachine {
 
     private SudokuElement findElementToGuess() throws ElementNotFoundException {
         int theLowestPoss = findTheLowestPossibilitiesQuantity();
+        if (theLowestPoss == 0)
+            throw new ElementNotFoundException();
         return findFirstElementWithPossibility(theLowestPoss);
     }
 

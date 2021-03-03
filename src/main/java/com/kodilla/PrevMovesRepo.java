@@ -31,7 +31,13 @@ public class PrevMovesRepo {
     }
 
     public SudokuBoard loadPrevBoard() throws CloneNotSupportedException {
-        ElementDeepCopy lastSave = prevMovesList.get(prevMovesList.size()-1);
+        ElementDeepCopy lastSave;
+        try {
+            lastSave = prevMovesList.get(prevMovesList.size()-1);
+        }
+        catch (ArrayIndexOutOfBoundsException e) {
+            return null;
+        }
         SudokuBoard savedBoard = lastSave.getBoard().getCopy();
         if (savedBoard.hasObviousValue()) {
             prevMovesList.remove(prevMovesList.size()-1);
